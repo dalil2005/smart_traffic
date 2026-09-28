@@ -1,391 +1,279 @@
+<div align="center">
+
 # 🚦 Smart Traffic Light Intersection
 
-### Intelligent Traffic Signal Simulation with Python & Pygame
+**An adaptive traffic-signal simulator with emergency priority and reproducible Fixed-vs-Smart benchmarking.**
 
-<p align="center">
-  <strong>🚗 Realistic Traffic Simulation • 🧠 Smart Signal Control • 🚑 Emergency Priority • 📊 Performance Analytics</strong>
-</p>
+Built with Python and Pygame. Designed so the "brain" can be swapped for ML/RL without touching the simulation.
 
-<p align="center">
-  A modular traffic intersection simulator built with <strong>Python</strong> and <strong>Pygame</strong>, featuring Fixed-Time and Smart adaptive traffic-light control.
-</p>
+<br>
 
-<p align="center">
-
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge\&logo=python\&logoColor=white)
-![Pygame](https://img.shields.io/badge/Pygame-2.x-00A86B?style=for-the-badge\&logo=python\&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Pygame](https://img.shields.io/badge/Pygame-2.x-00A86B?style=for-the-badge&logo=python&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Architecture-Modular-8A2BE2?style=for-the-badge)
-![AI Controller](https://img.shields.io/badge/Controller-Smart%20Adaptive-FF6B35?style=for-the-badge)
+![Controller](https://img.shields.io/badge/Controller-Smart%20Adaptive-FF6B35?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-2EA44F?style=for-the-badge)
 
-</p>
+<br>
+
+<img src="assets/simulation.png" width="860" alt="Smart Traffic Light simulation screenshot">
+
+<sub>Add your best screenshot or GIF at <code>assets/simulation.png</code></sub>
+
+<br><br>
+
+[Features](#-features) ·
+[Quick Start](#-quick-start) ·
+[Controls](#-controls) ·
+[How It Works](#-how-it-works) ·
+[Architecture](#-architecture) ·
+[Roadmap](#-roadmap)
+
+</div>
 
 ---
 
 ## 📌 Overview
 
-**Smart Traffic Light Intersection** is a traffic simulation designed to demonstrate how adaptive traffic-light systems can respond to changing traffic conditions.
+Fixed-timer traffic lights ignore reality: one road can be jammed while the other is empty. This project shows what happens when the signal **reacts** to traffic instead.
 
-Instead of relying only on fixed timing, the simulator includes a **Smart Controller** that evaluates traffic conditions and dynamically determines how long each direction should receive a green light.
+A **Smart Controller** measures cars, queue length and waiting time on each axis, then decides how long the next green should last and when to end the current one early. You can watch it live, switch back to fixed timing, or run a **headless benchmark** where both controllers face the *exact same* traffic.
 
-The project also simulates:
-
-* 🚗 Vehicle acceleration and braking
-* 🛑 Safe stopping distances
-* 🚦 Traffic-light state transitions
-* 📊 Traffic density and queues
-* 🚑 Emergency vehicle priority
-* 📈 Traffic statistics
-* 🚧 Traffic backlog outside the map
-* ⚡ Fixed vs Smart comparison
-* 🎮 Interactive controls
-* 🧩 Modular architecture ready for ML/RL integration
+| | Fixed Mode | Smart Mode |
+|---|---|---|
+| Green duration | Constant | Computed from live traffic |
+| Reacts to empty roads | ✗ | ✓ ends green early |
+| Starvation protection | ✗ | ✓ |
+| Emergency priority | ✓ | ✓ |
 
 ---
 
-# ✨ Features
+## ✨ Features
 
-| Feature                        | Description                                   |
-| ------------------------------ | --------------------------------------------- |
-| 🚦 **Fixed Mode**              | Traditional fixed-time traffic signals        |
-| 🧠 **Smart Mode**              | Adaptive green-light control based on traffic |
-| 🚗 **Vehicle Physics**         | Acceleration, braking and safety distance     |
-| 🛑 **Red-Light Safety**        | Vehicles never cross a red signal             |
-| 🟡 **Yellow Logic**            | Vehicles stop if safe; otherwise continue     |
-| 🔄 **Safe Transitions**        | `GREEN → YELLOW → ALL_RED → GREEN`            |
-| 🚑 **Emergency Priority**      | Emergency vehicles receive priority           |
-| 📊 **Traffic Score**           | Combines cars, queues and waiting time        |
-| 🚧 **Backlog Tracking**        | Vehicles waiting outside the map are counted  |
-| ⏱️ **Starvation Guard**        | Prevents excessive waiting                    |
-| 🌙 **Time Modes**              | Auto, Night, Normal, AM Rush, PM Rush         |
-| 📈 **Statistics**              | Measures traffic performance                  |
-| 🧪 **Headless Comparison**     | Fixed vs Smart using the same seed            |
-| 🎮 **Interactive UI**          | Controls available directly in the dashboard  |
-| 🧩 **Extensible Architecture** | Ready for ML/RL controllers                   |
+<table>
+<tr>
+<td width="50%" valign="top">
 
----
+### 🧠 Control
+- **Fixed** and **Smart** adaptive modes
+- Traffic score from cars, queue and wait
+- Starvation guard against long waits
+- Emergency vehicle priority
 
-# 🖥️ Simulation
+</td>
+<td width="50%" valign="top">
 
-<p align="center">
+### 🚗 Simulation
+- Acceleration, braking, safe following distance
+- Vehicles never cross a red light
+- Yellow logic: stop if safe, otherwise proceed
+- Backlog tracking for cars waiting off-map
 
-<!-- Replace this with your actual screenshot -->
+</td>
+</tr>
+<tr>
+<td valign="top">
 
-<img src="assets/simulation.png" width="850">
+### 📊 Analysis
+- Live statistics dashboard
+- Headless Fixed vs Smart comparison
+- Same random seed, reproducible results
 
-</p>
+</td>
+<td valign="top">
 
-> 💡 **Tip:** Add your best screenshot to `assets/simulation.png` to make the repository immediately visual and professional.
+### 🎮 Interaction
+- Four traffic densities
+- Five time modes (Auto, Night, Normal, AM/PM Rush)
+- Speed control from 0.5× to 10×
+- Everything controllable from the keyboard
 
----
-
-# 🧠 Smart Traffic Control
-
-The Smart Controller dynamically calculates the required green-light duration using the current traffic conditions.
-
-### Green-Time Formula
-
-```text
-Green Time =
-    15
-  + 2 × cars
-  + 0.2 × average_wait
-```
-
-The result is then limited between configurable minimum and maximum values:
-
-```text
-MIN_GREEN ≤ Green Time ≤ MAX_GREEN
-```
-
-This means that:
-
-* 🚗 More vehicles → longer green time
-* ⏳ Higher waiting time → longer green time
-* 🟢 Empty roads → green can finish earlier
-* 🚨 Excessive waiting → starvation protection activates
+</td>
+</tr>
+</table>
 
 ---
 
-# 📊 Traffic Score
+## 🚀 Quick Start
 
-The Smart Controller evaluates traffic using:
+```bash
+# 1. Clone
+git clone https://github.com/YOUR_USERNAME/smart-traffic.git
+cd smart-traffic
 
-```text
-Traffic Score =
-    cars
-  + 1.5 × queue
-  + 0.2 × average_wait
+# 2. Install
+pip install -r requirements.txt
+
+# 3. Run
+python main.py
 ```
 
-This combines three important signals:
+> [!NOTE]
+> Requires **Python 3.11+** and **Pygame 2.x** on Windows or Linux. No GPU needed.
 
-```text
-             ┌──────────────┐
-             │ Traffic Data │
-             └──────┬───────┘
-                    │
-       ┌────────────┼────────────┐
-       ▼            ▼            ▼
-    🚗 Cars      🚧 Queue    ⏳ Wait Time
-       │            │            │
-       └────────────┼────────────┘
-                    ▼
-             Traffic Score
-                    │
-                    ▼
-          🧠 Smart Controller
-                    │
-                    ▼
-             🚦 Green Time
-```
+### 🧪 Suggested first session
+
+1. Press `4` for **VERY HIGH** traffic and run in **Fixed** mode (`F`). Watch the queues grow.
+2. Press `S` to switch to **Smart** mode and watch green times adapt.
+3. Press `E` to spawn an emergency vehicle and watch the priority sequence.
+4. Press `C` to run the **Fixed vs Smart** comparison.
 
 ---
 
-# 🚦 Traffic-Light State Machine
+## 🎮 Controls
 
-The simulator never jumps directly from one green direction to the other.
+<table>
+<tr>
+<td valign="top">
 
-```text
-              ┌───────────────┐
-              │     GREEN     │
-              └───────┬───────┘
-                      │
-                      ▼
-              ┌───────────────┐
-              │    YELLOW     │
-              └───────┬───────┘
-                      │
-                      ▼
-              ┌───────────────┐
-              │    ALL RED    │
-              └───────┬───────┘
-                      │
-                      ▼
-              ┌───────────────┐
-              │ OTHER GREEN   │
-              └───────────────┘
-```
+**Simulation**
 
-This provides a safer transition between traffic directions.
+| Key | Action |
+|:--:|---|
+| `F` | Fixed mode |
+| `S` | Smart mode |
+| `SPACE` | Pause / resume |
+| `R` | Reset |
+| `C` | Run comparison |
 
----
+</td>
+<td valign="top">
 
-# 🚗 Vehicle Behaviour
+**Traffic**
 
-Vehicles are simulated with basic acceleration and braking behaviour.
+| Key | Action |
+|:--:|---|
+| `1` | 🟢 Low |
+| `2` | 🟡 Medium |
+| `3` | 🟠 High |
+| `4` | 🔴 Very high |
+| `T` | Cycle time mode |
+| `E` | Spawn emergency vehicle |
 
-Each vehicle considers:
+</td>
+</tr>
+</table>
 
-```text
-Acceleration
-     ↓
-Current speed
-     ↓
-Distance to vehicle ahead
-     ↓
-Traffic signal
-     ↓
-Safe stopping distance
-     ↓
-Target speed
-```
+**Speed:** `0.5×` · `1×` · `2×` · `5×` · `10×` (dashboard buttons)
 
-### Safe stopping rule
-
-The simulator uses the braking-distance relationship:
-
-```text
-v²
-─── ≤ distance
-2a
-```
-
-If a vehicle can safely stop before the intersection, it stops.
-
-If stopping would no longer be safe, the vehicle continues through the yellow phase.
-
-This avoids unrealistic instant braking.
+**Time modes:** `AUTO → NIGHT → NORMAL → AM RUSH → PM RUSH → AUTO`
 
 ---
 
-# 🚑 Emergency Priority
+## 🧠 How It Works
 
-Emergency vehicles can be introduced dynamically using:
+### Smart green time
 
-```text
-E
+$$
+\text{Green} = \mathrm{clamp}\Big(15 + 2 \times \text{cars} + 0.2 \times \text{avg\_wait},\ \text{MIN\_GREEN},\ \text{MAX\_GREEN}\Big)
+$$
+
+- More cars → longer green
+- Longer waits → longer green
+- Empty road → green can end early
+- Excessive wait on the other axis → starvation protection kicks in
+
+### Traffic score
+
+$$
+\text{Score} = \text{cars} + 1.5 \times \text{queue} + 0.2 \times \text{avg\_wait}
+$$
+
+Queued cars weigh more than moving ones because they represent traffic that is already blocked.
+
+```mermaid
+flowchart LR
+    A[🚗 Cars] --> S[Traffic Score]
+    B[🚧 Queue] --> S
+    C[⏳ Avg wait] --> S
+    S --> K{{🧠 Smart Controller}}
+    K --> G[🚦 Green time]
+    K --> N[Next axis]
+    K --> E[End green early?]
 ```
 
-The priority system:
+### Signal state machine
 
-```text
-Emergency detected
-       │
-       ▼
-Identify direction
-       │
-       ▼
-Check current signal
-       │
-       ▼
-Finish opposing green safely
-       │
-       ▼
-Yellow
-       │
-       ▼
-All Red
-       │
-       ▼
-🚑 Emergency Green
-       │
-       ▼
-Emergency passes
-       │
-       ▼
-Return to Smart/Fixed control
+Directions never jump straight from green to green.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> GREEN_A
+    GREEN_A --> YELLOW_A
+    YELLOW_A --> ALL_RED_1
+    ALL_RED_1 --> GREEN_B
+    GREEN_B --> YELLOW_B
+    YELLOW_B --> ALL_RED_2
+    ALL_RED_2 --> GREEN_A
 ```
 
-Supported emergency types include:
+### Vehicle behaviour
 
-* 🚑 Ambulance
-* 🚒 Fire Truck
-* 🚓 Police
+Each car decides its target speed from its speed, the gap to the car ahead, and the signal ahead. The safe-stop rule is:
+
+$$
+\frac{v^2}{2a} \le d
+$$
+
+If the car can stop before the stop line (`d`), it does. If not, it continues through the yellow. This removes unrealistic instant braking.
+
+### 🚑 Emergency priority
+
+```mermaid
+flowchart TD
+    A[🚑 Emergency detected] --> B[Identify its axis]
+    B --> C{Already green?}
+    C -- Yes --> H[Hold green until it passes]
+    C -- No --> D[Finish opposing green safely]
+    D --> Y[Yellow]
+    Y --> R[All red]
+    R --> G[🚑 Emergency green]
+    G --> P[Emergency passes]
+    H --> P
+    P --> X[Return to Fixed / Smart control]
+```
+
+Supported types: 🚑 Ambulance · 🚒 Fire truck · 🚓 Police
 
 ---
 
-# 🌡️ Traffic Density
+## 📈 Fixed vs Smart benchmark
 
-The simulator supports four traffic-density levels:
+Press `C` to run both controllers **headless** on identical, seeded traffic.
 
-| Level | Mode      |
-| ----- | --------- |
-| 🟢    | LOW       |
-| 🟡    | MEDIUM    |
-| 🟠    | HIGH      |
-| 🔴    | VERY HIGH |
-
-Change density during simulation using:
-
-```text
-1 → LOW
-2 → MEDIUM
-3 → HIGH
-4 → VERY HIGH
+```mermaid
+flowchart TB
+    SEED([Same random seed]) --> F[Fixed simulation]
+    SEED --> M[Smart simulation]
+    F --> R[(📊 Statistics)]
+    M --> R
 ```
+
+Because both runs see the same generated cars, differences come from the controller, not from luck.
+
+| Metric | What it tells you |
+|---|---|
+| Average / max waiting time | Fairness and comfort |
+| Queue size | Congestion |
+| Throughput | Vehicles cleared |
+| Backlog | Demand the intersection could not absorb |
+| Duration | Length of the test |
 
 ---
 
-# 🕐 Time Modes
+## 🏗️ Architecture
 
-Press:
-
-```text
-T
-```
-
-to cycle through:
-
-```text
-AUTO
-  ↓
-NIGHT
-  ↓
-NORMAL
-  ↓
-AM RUSH
-  ↓
-PM RUSH
-  ↓
-AUTO
-```
-
-Different time periods can generate different traffic behaviour and densities.
-
----
-
-# 🎮 Controls
-
-|   Key   | Action                        |
-| :-----: | ----------------------------- |
-|   `F`   | Switch to Fixed Mode          |
-|   `S`   | Switch to Smart Mode          |
-| `SPACE` | Pause / Resume                |
-|   `R`   | Reset simulation              |
-|   `1`   | LOW traffic                   |
-|   `2`   | MEDIUM traffic                |
-|   `3`   | HIGH traffic                  |
-|   `4`   | VERY HIGH traffic             |
-|   `T`   | Change time mode              |
-|   `E`   | Spawn emergency vehicle       |
-|   `C`   | Run Fixed vs Smart comparison |
-
-### ⚡ Simulation Speed
-
-The dashboard also provides:
-
-```text
-0.5×   1×   2×   5×   10×
-```
-
----
-
-# 📈 Fixed vs Smart
-
-The project includes an actual headless comparison system.
-
-Press:
-
-```text
-C
-```
-
-to run a comparison between:
-
-```text
-┌──────────────────┐
-│   SAME SEED      │
-└────────┬─────────┘
-         │
-    ┌────┴────┐
-    ▼         ▼
- Fixed      Smart
-    │         │
-    ▼         ▼
-Simulation Simulation
-    │         │
-    └────┬────┘
-         ▼
-   📊 Statistics
-```
-
-Using the same random seed allows both controllers to be evaluated under the same generated traffic conditions.
-
-Typical metrics can include:
-
-* Average waiting time
-* Maximum waiting time
-* Queue size
-* Throughput
-* Number of vehicles
-* Backlog
-* Simulation duration
-
-> This makes the comparison reproducible rather than simply comparing two different random simulations.
-
----
-
-# 🏗️ Architecture
-
-The project follows a modular architecture so that simulation logic, AI logic and UI remain separated.
+> **Design rule:** keep the simulation independent from the intelligence controlling it.
+> `Simulation ≠ AI ≠ UI`
 
 ```text
 smart_traffic/
+├── config.py
+├── main.py
+├── requirements.txt
 │
-├── 📄 config.py
-│
-├── 📁 simulation/
+├── simulation/          # What happens?
 │   ├── car.py
 │   ├── traffic_light.py
 │   ├── intersection.py
@@ -394,25 +282,17 @@ smart_traffic/
 │   ├── simulation.py
 │   └── comparison.py
 │
-├── 📁 ai/
+├── ai/                  # What should the light do?
 │   ├── traffic_controller.py
 │   ├── traffic_score.py
 │   └── priority_system.py
 │
-├── 📁 ui/
-│   ├── renderer.py
-│   └── dashboard.py
-│
-├── 📄 main.py
-├── 📄 requirements.txt
-└── 📄 README.md
+└── ui/                  # How does the user see it?
+    ├── renderer.py
+    └── dashboard.py
 ```
 
----
-
-# 🔌 Controller Interface
-
-The traffic controller exposes a small interface:
+### Controller interface
 
 ```python
 green_time(...)
@@ -420,333 +300,92 @@ should_end_green(...)
 choose_next_axis(...)
 ```
 
-This makes it possible to replace the current Smart Controller without rewriting the simulation.
+Implement these three methods and you have a new controller.
 
-Current architecture:
-
-```text
-                Simulation
-                    │
-                    ▼
-             Traffic Manager
-                    │
-                    ▼
-          ┌──────────────────┐
-          │ Traffic Controller│
-          └────────┬─────────┘
-                   │
-        ┌──────────┴──────────┐
-        ▼                     ▼
-   FixedController      SmartController
-                              │
-                              ▼
-                       Traffic Metrics
+```mermaid
+flowchart TB
+    SIM[Simulation] --> TM[Traffic Manager]
+    TM --> IF{{Controller interface}}
+    IF --> FIX[FixedController]
+    IF --> SMART[SmartController]
+    IF -.future.-> RL[ML / RL Controller]
+    SMART --> MET[Traffic Metrics]
 ```
 
 ---
 
-# 🤖 Future ML / RL Integration
+## 🤖 Future: ML, RL and Computer Vision
 
-The architecture is designed to support a future Machine Learning or Reinforcement Learning controller.
+<details>
+<summary><b>Reinforcement-learning formulation</b></summary>
 
-For example:
+<br>
 
-```text
-Camera / YOLO
-     │
-     ▼
-Vehicle Detection
-     │
-     ▼
-Traffic Metrics
-     │
-     ▼
-ML / RL Controller
-     │
-     ▼
-Traffic Signal
+| | |
+|---|---|
+| **State** | Vehicle count, queue length, average wait, current signal, time since last switch, emergency present |
+| **Action** | Keep green · Switch direction · Extend green |
+| **Reward** | Lower wait, shorter queues, higher throughput, emergency priority |
+
+Only the controller is replaced. The simulation stays unchanged.
+
+</details>
+
+<details>
+<summary><b>Camera-based pipeline</b></summary>
+
+<br>
+
+```mermaid
+flowchart LR
+    CAM[📹 Camera] --> Y[YOLO detection]
+    Y --> CNT[Vehicle counting]
+    CNT --> Q[Queue estimation]
+    Q --> MET[Traffic metrics]
+    MET --> CTRL[Smart / RL controller]
+    CTRL --> SIG[🚦 Signal]
 ```
 
-A future controller could learn from:
+Swapping the simulated traffic source for real camera data would turn this into a real-world prototype.
 
-```text
-State:
-├── Number of vehicles
-├── Queue length
-├── Average waiting time
-├── Current signal
-├── Time since last switch
-└── Emergency vehicles
-
-Action:
-├── Keep green
-├── Switch direction
-└── Extend green
-
-Reward:
-├── Lower waiting time
-├── Lower queue length
-├── Higher throughput
-└── Emergency priority
-```
-
-The existing simulation can remain unchanged while replacing only the controller.
+</details>
 
 ---
 
-# 📷 Computer Vision Integration
+## 🛣️ Roadmap
 
-A future version can replace the simulated traffic source with real camera data.
+**Done**
+- [x] Intersection, vehicle movement, acceleration and braking
+- [x] Safe stopping logic and yellow-light handling
+- [x] Fixed and Smart controllers, traffic scoring
+- [x] Emergency priority and backlog tracking
+- [x] Statistics and headless Fixed vs Smart comparison
+- [x] Interactive dashboard
 
-Possible pipeline:
-
-```text
-📹 Traffic Camera
-       │
-       ▼
-   YOLO Detection
-       │
-       ▼
-Vehicle Counting
-       │
-       ▼
-Queue Estimation
-       │
-       ▼
-Traffic Metrics
-       │
-       ▼
-Smart Controller
-       │
-       ▼
-🚦 Traffic Signal
-```
-
-This would allow the project to evolve from a simulation into a real-world traffic-management prototype.
+**Next**
+- [ ] Multiple lanes
+- [ ] Left / right turns
+- [ ] Pedestrian crossings
+- [ ] Multiple intersections and network-wide control
+- [ ] YOLO vehicle detection and real camera input
+- [ ] Reinforcement-learning controller
+- [ ] Real-time analytics dashboard
 
 ---
 
-# ⚙️ Installation
+## 🤝 Contributing
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/smart-traffic.git
-cd smart-traffic
-```
-
-### 2. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run the simulation
-
-```bash
-python main.py
-```
-
----
-
-# 💻 Requirements
-
-Recommended environment:
-
-```text
-Python 3.11+
-Pygame 2.x
-Windows / Linux
-```
-
-The simulation is lightweight and does not require a dedicated GPU.
-
----
-
-# 🧪 Example Workflow
-
-A typical test session can look like:
-
-```text
-1. Start simulation
-        ↓
-2. Select VERY HIGH traffic
-        ↓
-3. Run Fixed Mode
-        ↓
-4. Observe queues / waiting
-        ↓
-5. Switch to Smart Mode
-        ↓
-6. Observe adaptive green times
-        ↓
-7. Spawn emergency vehicle
-        ↓
-8. Observe priority handling
-        ↓
-9. Press C
-        ↓
-10. Compare Fixed vs Smart
-```
-
----
-
-# 📊 Project Goals
-
-The project aims to demonstrate several concepts together:
-
-### 🚦 Traffic Simulation
-
-Real-time intersection behaviour with vehicles, queues and signals.
-
-### 🧠 Adaptive Control
-
-Traffic lights respond to current traffic conditions instead of using only fixed timing.
-
-### 🚑 Priority Management
-
-Emergency vehicles can temporarily override normal traffic control.
-
-### 📈 Data Analysis
-
-Simulation statistics can be used to evaluate controller performance.
-
-### 🤖 AI Ready
-
-The architecture provides a clean path toward ML/RL-based traffic control.
-
----
-
-# 🛣️ Roadmap
-
-* [x] Basic intersection simulation
-* [x] Vehicle movement
-* [x] Acceleration / braking
-* [x] Safe stopping logic
-* [x] Fixed traffic controller
-* [x] Smart traffic controller
-* [x] Traffic scoring
-* [x] Emergency priority
-* [x] Traffic backlog
-* [x] Simulation statistics
-* [x] Fixed vs Smart comparison
-* [x] Interactive dashboard
-* [ ] Multiple lanes
-* [ ] Left / right turns
-* [ ] Pedestrian crossings
-* [ ] Multiple intersections
-* [ ] Network-wide traffic control
-* [ ] YOLO vehicle detection
-* [ ] Real camera input
-* [ ] Reinforcement Learning controller
-* [ ] Real-time analytics dashboard
-
----
-
-# 🎯 Why This Project?
-
-Traditional traffic signals often rely on predefined timing.
-
-Real traffic, however, is dynamic.
-
-A road can suddenly become:
-
-```text
-LOW
- ↓
-MEDIUM
- ↓
-HIGH
- ↓
-VERY HIGH
-```
-
-while another direction remains almost empty.
-
-An adaptive system can use live traffic information to adjust the signal accordingly.
-
-This project provides a controlled environment for experimenting with these ideas before moving toward computer vision, machine learning and real-world traffic systems.
-
----
-
-# 👨‍💻 Project Structure Philosophy
-
-The main design principle is:
-
-> **Keep the simulation independent from the intelligence controlling it.**
-
-That means:
-
-```text
-Simulation ≠ AI ≠ UI
-```
-
-Each component has its own responsibility:
-
-```text
-Simulation
-→ What happens?
-
-AI Controller
-→ What should the traffic light do?
-
-UI
-→ How does the user see and control it?
-```
-
-This separation makes the project easier to test, maintain and extend.
-
----
-
-# ⭐ Future Vision
-
-The long-term goal is to evolve the project into a complete intelligent traffic-management platform:
-
-```text
-             🚗 🚗 🚗
-          🚗           🚗
-               │
-               │
-        📹 Traffic Camera
-               │
-               ▼
-          YOLO Detection
-               │
-               ▼
-        Traffic Analytics
-               │
-               ▼
-       🧠 AI / RL Controller
-               │
-               ▼
-          🚦 Smart Signals
-               │
-               ▼
-        📊 Performance Data
-               │
-               └──────────────┐
-                              │
-                              ▼
-                         Continuous
-                          Learning
-```
-
----
+Ideas and pull requests are welcome. A great first contribution is a new controller class that implements the [controller interface](#controller-interface) and beats `SmartController` in the `C` benchmark.
 
 ## 📜 License
 
-Add your preferred license here, for example:
+Released under the **MIT License**. See [`LICENSE`](LICENSE).
 
-```text
-MIT License
-```
+<div align="center">
+<br>
 
----
+**🚦 Smart Traffic Light Intersection**
 
-<p align="center">
+<sub>Built with Python · Pygame · AI-ready architecture</sub>
 
-### 🚦 Built with Python • Pygame • AI-oriented Architecture
-
-**Smart Traffic Light Intersection**
-
-</p>
+</div>
